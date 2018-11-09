@@ -4,15 +4,20 @@ Environments and wrappers for Sonic training.
 
 import gym
 import numpy as np
+import os
 
 from baselines.common.atari_wrappers import WarpFrame, FrameStack
+
+import retro_contest
+from retro_contest.local import make
 import gym_remote.client as grc
 
 def make_env(stack=True, scale_rew=True):
     """
     Create an environment with some standard wrappers.
     """
-    env = grc.RemoteEnv('tmp/sock')
+    env = make(game='SonicTheHedgehog2-Genesis', state='MetropolisZone.Act3', bk2dir='movies/')
+    env = retro_contest.Monitor(env, os.path.join('results', 'monitor.csv'), os.path.join('results', 'log.csv'))
     env = SonicDiscretizer(env)
     if scale_rew:
         env = RewardScaler(env)

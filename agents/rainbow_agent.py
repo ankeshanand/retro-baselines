@@ -21,6 +21,7 @@ def main():
     """Run DQN until the environment throws an exception."""
     env = AllowBacktracking(make_env(stack=False, scale_rew=False))
     env = BatchedFrameStack(BatchedGymEnv([[env]]), num_images=4, concat=False)
+    print(env)
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True # pylint: disable=E1101
     with tf.Session(config=config) as sess:
@@ -28,11 +29,12 @@ def main():
                                   env.action_space.n,
                                   gym_space_vectorizer(env.observation_space),
                                   min_val=-200,
-                                  max_val=200))
+                                  max_val=200), discount=0.999)
         player = NStepPlayer(BatchedPlayer(env, dqn.online_net), 3)
         optimize = dqn.optimize(learning_rate=1e-4)
+        print(tf.trainable_variables())
         sess.run(tf.global_variables_initializer())
-        dqn.train(num_steps=2000000, # Make sure an exception arrives before we stop.
+        dqn.train(num_steps=1000000, # Make sure an exception arrives before we stop.
                   player=player,
                   replay_buffer=PrioritizedReplayBuffer(500000, 0.5, 0.4, epsilon=0.1),
                   optimize_op=optimize,
