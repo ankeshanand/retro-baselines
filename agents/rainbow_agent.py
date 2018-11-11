@@ -31,7 +31,7 @@ def main():
                                   min_val=-200,
                                   max_val=200), discount=0.99)
         player = NStepPlayer(BatchedPlayer(env, dqn.online_net), 3)
-        non_conv_vars = [var for var in tf.trainable_variables() if 'conv' not in var]
+        non_conv_vars = [var for var in tf.trainable_variables() if 'conv' not in var.name]
         print(non_conv_vars)
         optimize = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(dqn.loss, var_list=non_conv_vars)
         sess.run(tf.global_variables_initializer())
