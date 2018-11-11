@@ -31,8 +31,9 @@ def main():
                                   min_val=-200,
                                   max_val=200), discount=0.99)
         player = NStepPlayer(BatchedPlayer(env, dqn.online_net), 3)
-        optimize = dqn.optimize(learning_rate=1e-4)
-        print(tf.trainable_variables())
+        non_conv_vars = [var for var in tf.trainable_variables() if 'conv' not in var]
+        print(non_conv_vars)
+        optimize = dqn.optimize(learning_rate=1e-4, var_list=non_conv_vars)
         sess.run(tf.global_variables_initializer())
         dqn.train(num_steps=1000000, # Make sure an exception arrives before we stop.
                   player=player,
