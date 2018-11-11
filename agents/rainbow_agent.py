@@ -30,17 +30,26 @@ def main():
                                   gym_space_vectorizer(env.observation_space),
                                   min_val=-200,
                                   max_val=200), discount=0.99)
-        player = NStepPlayer(BatchedPlayer(env, dqn.online_net), 3)
+        player = NStepPlayer(BatchedPlayer(env, dqn.online_net), 4)
         non_conv_vars = [var for var in tf.trainable_variables() if 'conv' not in var.name]
         print(non_conv_vars)
-        optimize = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(dqn.loss, var_list=non_conv_vars)
+        optimize_all = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(dqn.loss)
         sess.run(tf.global_variables_initializer())
-        dqn.train(num_steps=1000000, # Make sure an exception arrives before we stop.
+        dqn.train(num_steps=100000, # Make sure an exception arrives before we stop.
                   player=player,
                   replay_buffer=PrioritizedReplayBuffer(500000, 0.5, 0.4, epsilon=0.1),
-                  optimize_op=optimize,
+                  optimize_op=optimize_all,
                   train_interval=1,
-                  target_interval=8192,
+                  target_interval=1024,
+                  batch_size=32,
+                  min_buffer_size=20000)
+        optimize_non_conv = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(dqn.loss, var_list=non_conv_vars)
+        dqn.train(num_steps=900000,  # Make sure an exception arrives before we stop.
+                  player=player,
+                  replay_buffer=PrioritizedReplayBuffer(500000, 0.5, 0.4, epsilon=0.1),
+                  optimize_op=optimize_non_conv,
+                  train_interval=1,
+                  target_interval=1024,
                   batch_size=32,
                   min_buffer_size=20000)
 
