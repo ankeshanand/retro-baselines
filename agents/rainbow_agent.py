@@ -24,7 +24,6 @@ def main():
     print(env)
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True # pylint: disable=E1101
-    saver = tf.train.Saver()
     with tf.Session(config=config) as sess:
         dqn = DQN(*rainbow_models(sess,
                                   env.action_space.n,
@@ -35,6 +34,7 @@ def main():
         optimize = dqn.optimize(learning_rate=1e-4)
         print(tf.trainable_variables())
         sess.run(tf.global_variables_initializer())
+        saver = tf.train.Saver()
         dqn.train(num_steps=1000000, # Make sure an exception arrives before we stop.
                   player=player,
                   replay_buffer=PrioritizedReplayBuffer(500000, 0.5, 0.4, epsilon=0.1),
