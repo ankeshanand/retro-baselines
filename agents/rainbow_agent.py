@@ -36,9 +36,10 @@ def main():
         optimize_all = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(dqn.loss)
         optimize_non_conv = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(dqn.loss, var_list=non_conv_vars)
         sess.run(tf.global_variables_initializer())
+        buffer = PrioritizedReplayBuffer(500000, 0.5, 0.4, epsilon=0.1)
         dqn.train(num_steps=100000, # Make sure an exception arrives before we stop.
                   player=player,
-                  replay_buffer=PrioritizedReplayBuffer(500000, 0.5, 0.4, epsilon=0.1),
+                  replay_buffer=buffer,
                   optimize_op=optimize_all,
                   train_interval=1,
                   target_interval=1024,
@@ -46,7 +47,7 @@ def main():
                   min_buffer_size=20000)
         dqn.train(num_steps=900000,  # Make sure an exception arrives before we stop.
                   player=player,
-                  replay_buffer=PrioritizedReplayBuffer(500000, 0.5, 0.4, epsilon=0.1),
+                  replay_buffer=buffer,
                   optimize_op=optimize_non_conv,
                   train_interval=1,
                   target_interval=1024,
