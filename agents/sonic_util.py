@@ -16,7 +16,7 @@ def make_env(stack=True, scale_rew=True):
     """
     Create an environment with some standard wrappers.
     """
-    env = make(game='SonicTheHedgehog2-Genesis', state='MetropolisZone.Act3', bk2dir='movies_0.99/')
+    env = make(game='SonicTheHedgehog2-Genesis', state='MetropolisZone.Act2', bk2dir='movies_0.99/')
     env = retro_contest.Monitor(env, os.path.join('results', 'monitor_0.99.csv'), os.path.join('results', 'log_0.99.csv'))
     env = SonicDiscretizer(env)
     if scale_rew:

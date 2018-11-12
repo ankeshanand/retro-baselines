@@ -24,6 +24,7 @@ def main():
     print(env)
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True # pylint: disable=E1101
+    saver = tf.train.Saver()
     with tf.Session(config=config) as sess:
         dqn = DQN(*rainbow_models(sess,
                                   env.action_space.n,
@@ -42,6 +43,7 @@ def main():
                   target_interval=8192,
                   batch_size=32,
                   min_buffer_size=20000)
+        saver.save(sess=sess, save_path='MetropolisZone-Act2-model')
 
 if __name__ == '__main__':
     try:
