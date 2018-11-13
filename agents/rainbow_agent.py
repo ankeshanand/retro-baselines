@@ -31,10 +31,10 @@ def main():
                                   min_val=-200,
                                   max_val=200), discount=0.99)
         player = NStepPlayer(BatchedPlayer(env, dqn.online_net), 3)
-        optimize = dqn.optimize(learning_rate=1e-4)
-        print(tf.trainable_variables())
-        sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver()
+        saver.restore(sess, 'models/model.ckpt')
+        optim, optimize = dqn.optimize(learning_rate=1e-4)
+        sess.run(tf.global_variables_initializer(optim.variables()))
         dqn.train(num_steps=1000000, # Make sure an exception arrives before we stop.
                   player=player,
                   replay_buffer=PrioritizedReplayBuffer(500000, 0.5, 0.4, epsilon=0.1),
@@ -43,7 +43,6 @@ def main():
                   target_interval=8192,
                   batch_size=32,
                   min_buffer_size=20000)
-        saver.save(sess=sess, save_path='models/model.ckpt')
 
 if __name__ == '__main__':
     try:
