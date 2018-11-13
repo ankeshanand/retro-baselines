@@ -43,7 +43,7 @@ def main():
                   target_interval=8192,
                   batch_size=32,
                   min_buffer_size=20000)
-        saver.save(sess=sess, save_path='MetropolisZone-Act2-model')
+        saver.save(sess=sess, save_path='models/model.ckpt')
 
 if __name__ == '__main__':
     try:
