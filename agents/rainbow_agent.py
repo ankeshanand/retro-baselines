@@ -34,7 +34,7 @@ def main():
         saver = tf.train.Saver()
         # saver.restore(sess, 'models/model.ckpt')
         optim, optimize = dqn.optimize(learning_rate=1e-4)
-        sess.run(tf.variables_initializer(optim.variables()))
+        sess.run(tf.global_variables_initializer())
         dqn.train(num_steps=1000000, # Make sure an exception arrives before we stop.
                   player=player,
                   replay_buffer=PrioritizedReplayBuffer(500000, 0.5, 0.4, epsilon=0.1),
