@@ -18,7 +18,7 @@ def make_env(stack=True, scale_rew=True):
     """
     env = make(game='SonicTheHedgehog2-Genesis', state='MetropolisZone.Act3', bk2dir='movies_tuned/')
     env = retro_contest.Monitor(env, os.path.join('results', 'monitor_tuned.csv'), os.path.join('results', 'log_tuned.csv'))
-    env = SonicDiscretizer(env)
+    env = SonicDiscretizer(env, noop=True)
     if scale_rew:
         env = RewardScaler(env)
     env = WarpFrame(env)
@@ -31,7 +31,7 @@ class SonicDiscretizer(gym.ActionWrapper):
     Wrap a gym-retro environment and make it use discrete
     actions for the Sonic game.
     """
-    def __init__(self, env):
+    def __init__(self, env, noop=False):
         super(SonicDiscretizer, self).__init__(env)
         buttons = ["B", "A", "MODE", "START", "UP", "DOWN", "LEFT", "RIGHT", "C", "Y", "X", "Z"]
         actions = [['LEFT'], ['RIGHT'], ['LEFT', 'DOWN'], ['RIGHT', 'DOWN'], ['DOWN'],
@@ -42,6 +42,8 @@ class SonicDiscretizer(gym.ActionWrapper):
             for button in action:
                 arr[buttons.index(button)] = True
             self._actions.append(arr)
+        if noop:
+            self._actions.append(np.array([False] * 12))
         self.action_space = gym.spaces.Discrete(len(self._actions))
 
     def action(self, a): # pylint: disable=W0221
